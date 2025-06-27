@@ -1,6 +1,5 @@
 //Define output bits (b0 = bit 0)
 #define b0 2
-#define LED 3
 
 
 bool bit_waiting = 0;
@@ -75,7 +74,6 @@ ISR(TIMER1_OVF_vect){
   TIMSK1 &= ~(1<<TOIE1);                             //Turn off overflow interrupt
   TCNT1 = 0x0000;                                    //Reset timer back to 0
   transmitting = 0;
-  digitalWrite(3, 0);
   bit = 0;
   bit_before = 0;
   beginning_interrupt_number = 0;
@@ -86,11 +84,9 @@ ISR(TIMER1_COMPA_vect){
   bit_now = digitalRead(b0);                         //Read input bit now
   if (bit_before == bit_now){                               //Did it change or stay the same?
     bit = 1;                                         //If same, this is a 1
-    digitalWrite(LED, 1);
   }
   else{
     bit = 0;                                         //If different, this is a 0
-    digitalWrite(LED, 0);
   }
   TIMSK1 &= ~(1<<OCIE1A);                            //Turn off timer1 interrupt
   EIFR |= (1<<INTF0);
@@ -101,8 +97,6 @@ ISR(TIMER1_COMPA_vect){
 
 void setup() {
   Serial.begin(9600);
-  pinMode(3, OUTPUT);
-  digitalWrite(3, 0);
   EICRA |= (1<<ISC01) | (1<<ISC00);                             //Interrupt on rising edge of pin 2 (INT0)
   EIMSK |= (1<<INT0);                              //Turn on external interrupt
 }

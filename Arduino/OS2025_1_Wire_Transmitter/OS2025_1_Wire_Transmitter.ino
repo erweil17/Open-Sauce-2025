@@ -4,7 +4,6 @@
 
 //Define output bits (b0 = bit 0)
 #define b0 2
-#define LED 3
 
 //Set this to number of bits per second. Touch max is 2000, light max is 1000
 #define FREQUENCY 500
@@ -49,7 +48,6 @@ ISR(TIMER1_COMPA_vect){
 void setup() {
   //Set pins to output mode
   pinMode(b0, OUTPUT);
-  pinMode(LED, OUTPUT);
   Serial.begin(9600);
 
   noInterrupts();           // disable all interrupts
