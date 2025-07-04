@@ -4,9 +4,12 @@
 
 //Define output bits (b0 = bit 0)
 #define b0 2
+#define STATUS_LED 3
+#define BIT_LED 4
 
-//Set this to number of bits per second. Touch max is 2000, light max is 1000
-#define FREQUENCY 500
+
+//Set this to number of bits per second. Touch max is 5000, light max is 1000
+#define FREQUENCY 1000
 
 bool bit = 0;
 bool b0_state = 0;
@@ -33,12 +36,12 @@ ISR(TIMER1_COMPA_vect){
       }
       bit_transmitted = 1;
     }
-    digitalWrite(b0, b0_state);
+    digitalWrite(b0, b0_state);  //add ! to make active low
     clock = !clock;
   }
   else{                //write everything to a 0 if not transmitting
     b0_state = 0;
-    digitalWrite(b0, 0);
+    digitalWrite(b0, 0);   //change to 1 to make active low
     clock = 1;
   }
 }
@@ -48,6 +51,8 @@ ISR(TIMER1_COMPA_vect){
 void setup() {
   //Set pins to output mode
   pinMode(b0, OUTPUT);
+  pinMode(STATUS_LED, OUTPUT);
+  pinMode(BIT_LED, OUTPUT);
   Serial.begin(9600);
 
   noInterrupts();           // disable all interrupts
@@ -66,6 +71,7 @@ void setup() {
 void loop() {
   
   if (Serial.available() > 0){
+    digitalWrite(STATUS_LED, 1);
     if (!transmitting_now){        //Did we just start transmitting a message?
       bit_transmitted = 0;         //If so, send a zero so the receiver can sync
       bit = 0;
@@ -80,6 +86,7 @@ void loop() {
     for (int i=7; i>=0; i--){      //Transmit next 7 bits
       bit_transmitted = 0;
       bit = (thisbyte >> i) & 1;
+      digitalWrite(BIT_LED, bit);
       data_ready = 1;              //Tell interrupt we are ready
       while (!bit_transmitted){    //Wait until interrupt has executed
         _delay_us(1);
@@ -90,6 +97,8 @@ void loop() {
   else{                            //No data in serial port
     data_ready = 0;
     transmitting_now = 0;
+    digitalWrite(BIT_LED, 0);
+    digitalWrite(STATUS_LED, 0);
   }
   if (Serial.available() == 8){    //Send a 1 if serial buffer nearly empty
       Serial.write("1");

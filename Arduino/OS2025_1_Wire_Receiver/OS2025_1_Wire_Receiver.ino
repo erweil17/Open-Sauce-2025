@@ -1,5 +1,7 @@
 //Define output bits (b0 = bit 0)
 #define b0 2
+#define STATUS_LED 3
+#define BIT_LED 4
 
 
 bool bit_waiting = 0;
@@ -99,21 +101,27 @@ void setup() {
   Serial.begin(9600);
   EICRA |= (1<<ISC01) | (1<<ISC00);                             //Interrupt on rising edge of pin 2 (INT0)
   EIMSK |= (1<<INT0);                              //Turn on external interrupt
+  pinMode(BIT_LED, OUTPUT);
+  pinMode(STATUS_LED, OUTPUT);
 }
 
 void loop() {
   int thisbyte = 0;
   if (transmitting){
+    digitalWrite(STATUS_LED, 1);
     for (int i=7; i>=0; i--){
       while (!bit_waiting && transmitting){
         _delay_us(1);
       }
       thisbyte |= bit << i;
       bit_waiting = 0;
+      digitalWrite(BIT_LED, bit);
     }
     if (transmitting){                            //fix random 128 showing at end
       Serial.write(thisbyte);
     }
   }
-  
+  else{
+    digitalWrite(STATUS_LED, 0);
+  }
 }
