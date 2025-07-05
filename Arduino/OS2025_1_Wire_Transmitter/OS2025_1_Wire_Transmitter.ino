@@ -9,7 +9,7 @@
 
 
 //Set this to number of bits per second. Touch max is 5000, light max is 1000
-#define FREQUENCY 1000
+#define INIT_FREQUENCY 500
 
 bool bit = 0;
 bool b0_state = 0;
@@ -17,6 +17,7 @@ bool bit_transmitted = 1;
 bool data_ready = 0;
 bool clock = 1;
 bool transmitting_now = 0;
+int FREQUENCY = INIT_FREQUENCY;
 
 
 //Interrupt. Runs FREQUENCY*2 times per second
@@ -36,12 +37,12 @@ ISR(TIMER1_COMPA_vect){
       }
       bit_transmitted = 1;
     }
-    digitalWrite(b0, b0_state);  //add ! to make active low
+    digitalWrite(b0, !b0_state);  //add ! to make active low
     clock = !clock;
   }
   else{                //write everything to a 0 if not transmitting
     b0_state = 0;
-    digitalWrite(b0, 0);   //change to 1 to make active low
+    digitalWrite(b0, 1);   //change to 1 to make active low
     clock = 1;
   }
 }
@@ -72,26 +73,51 @@ void loop() {
   
   if (Serial.available() > 0){
     digitalWrite(STATUS_LED, 1);
-    if (!transmitting_now){        //Did we just start transmitting a message?
-      bit_transmitted = 0;         //If so, send a zero so the receiver can sync
-      bit = 0;
-      data_ready = 1;              //Tell interrupt we are ready
-      while (!bit_transmitted){    //Wait until interrupt has executed
-        _delay_us(1);
+    int thisbyte = Serial.read();
+
+    if (thisbyte == 63 && transmitting_now == 0){    //if this is a command. Commands start with ?
+      delay(10);
+      int command = Serial.read();
+      int argument = (Serial.read() - 48);
+      argument = (argument * 10) + (Serial.read() - 48);
+      argument = (argument * 10) + (Serial.read() - 48);
+      argument = (argument * 10) + (Serial.read() - 48);
+      if (command == 70){            //F command for changing frequency
+        FREQUENCY = argument;
+        OCR1A = 62500/FREQUENCY/2;  // compare match register 16MHz/256/FREQUENCY
+        Serial.println("OK");
+      }
+      int temp = 0;                  //Now flush the buffer so we dont transmit this command
+      while (Serial.available() && temp < 10){
+        Serial.read();
+      temp++;
+    }
+    temp = 0;
+    }
+    else{                            //else this is not a command
+      if (!transmitting_now){        //Did we just start transmitting a message?
+        bit_transmitted = 0;         //If so, send a zero so the receiver can sync
+        bit = 0;
+        data_ready = 1;              //Tell interrupt we are ready
+        while (!bit_transmitted){    //Wait until interrupt has executed
+          _delay_us(1);
+        }
+      }
+
+      transmitting_now = 1;          //Now transmit actual message
+    
+      for (int i=7; i>=0; i--){      //Transmit next 7 bits
+        bit_transmitted = 0;
+        bit = (thisbyte >> i) & 1;
+        digitalWrite(BIT_LED, bit);
+        data_ready = 1;              //Tell interrupt we are ready
+        while (!bit_transmitted){    //Wait until interrupt has executed
+          _delay_us(1);
+        }
       }
     }
 
-    transmitting_now = 1;          //Now transmit actual message
-    int thisbyte = Serial.read();
-    for (int i=7; i>=0; i--){      //Transmit next 7 bits
-      bit_transmitted = 0;
-      bit = (thisbyte >> i) & 1;
-      digitalWrite(BIT_LED, bit);
-      data_ready = 1;              //Tell interrupt we are ready
-      while (!bit_transmitted){    //Wait until interrupt has executed
-        _delay_us(1);
-      }
-    }
+    
   }
 
   else{                            //No data in serial port
