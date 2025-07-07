@@ -12,14 +12,7 @@
 		<Property Name="server.vi.callsEnabled" Type="Bool">true</Property>
 		<Property Name="server.vi.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
-		<Item Name="Cancelled Global.vi" Type="VI" URL="../Cancelled Global.vi"/>
-		<Item Name="Data Sender.vi" Type="VI" URL="../Data Sender.vi"/>
-		<Item Name="Parse Data To Send.vi" Type="VI" URL="../Parse Data To Send.vi"/>
-		<Item Name="Percent Complete Global.vi" Type="VI" URL="../Percent Complete Global.vi"/>
-		<Item Name="PNG to Pixmap.vi" Type="VI" URL="../PNG to Pixmap.vi"/>
-		<Item Name="Received String to 2D Pixmap Array.vi" Type="VI" URL="../Received String to 2D Pixmap Array.vi"/>
 		<Item Name="Receiver HMI Main.vi" Type="VI" URL="../Receiver HMI Main.vi"/>
-		<Item Name="Send Text HMI.vi" Type="VI" URL="../Send Text HMI.vi"/>
 		<Item Name="Transmitter HMI Main.vi" Type="VI" URL="../Transmitter HMI Main.vi"/>
 		<Item Name="Dependencies" Type="Dependencies"/>
 		<Item Name="Build Specifications" Type="Build">
