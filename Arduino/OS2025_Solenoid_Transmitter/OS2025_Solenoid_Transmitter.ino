@@ -30,7 +30,7 @@ void loop() {
       delay(1000/FREQUENCY);
     }
     //If there are 8 bytes left in the serial port, send a 1 to the connected program
-    if (Serial.available() == 8){
+    if (Serial.available() == 16){
       Serial.write("1");
     }
   }

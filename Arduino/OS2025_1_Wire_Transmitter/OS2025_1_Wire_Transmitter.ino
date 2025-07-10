@@ -9,7 +9,7 @@
 
 
 //Set this to number of bits per second. Touch max is 5000, light max is 1000
-#define INIT_FREQUENCY 500
+#define INIT_FREQUENCY 5000
 
 bool bit = 0;
 bool b0_state = 0;
@@ -37,12 +37,12 @@ ISR(TIMER1_COMPA_vect){
       }
       bit_transmitted = 1;
     }
-    digitalWrite(b0, !b0_state);  //add ! to make active low
+    digitalWrite(b0, b0_state);  //add ! to make active low
     clock = !clock;
   }
   else{                //write everything to a 0 if not transmitting
     b0_state = 0;
-    digitalWrite(b0, 1);   //change to 1 to make active low
+    digitalWrite(b0, 0);   //change to 1 to make active low
     clock = 1;
   }
 }
@@ -126,7 +126,7 @@ void loop() {
     digitalWrite(BIT_LED, 0);
     digitalWrite(STATUS_LED, 0);
   }
-  if (Serial.available() == 8){    //Send a 1 if serial buffer nearly empty
+  if (Serial.available() == 16){    //Send a 1 if serial buffer nearly empty
       Serial.write("1");
   }
 }
