@@ -10,6 +10,7 @@ uint8_t fifoByte = 0;
 uint8_t bitCount = 0;
 bool halfturn_right = 0;
 bool halfturn_left = 0;
+int time_counter = 0;
 
 RotaryEncoder encoder(PIN_IN1, PIN_IN2, RotaryEncoder::LatchMode::TWO03);
 
@@ -32,6 +33,7 @@ void loop()
 
   
   if (pos != newPos) {
+    time_counter = 0;
     pos = newPos;
     
     //if turned right
@@ -62,6 +64,15 @@ void loop()
       }
     }
   } 
+  else{
+    delay(1);
+    time_counter += 1;
+    //its been 3 seconds since the encoder turned, assume cancelled
+    if (time_counter == 3000){
+      bitCount = 0;
+      fifoByte = 0; // Reset if needed
+    }
+  }
 } 
 
 void shiftInBit(uint8_t bit) {
