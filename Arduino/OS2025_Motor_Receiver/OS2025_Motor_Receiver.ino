@@ -71,6 +71,8 @@ void loop()
     if (time_counter == 3000){
       bitCount = 0;
       fifoByte = 0; // Reset if needed
+      //halfturn_right = 0;
+      //halfturn_left = 0;
     }
   }
 } 

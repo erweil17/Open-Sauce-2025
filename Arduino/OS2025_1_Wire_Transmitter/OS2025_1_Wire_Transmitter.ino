@@ -90,9 +90,9 @@ void loop() {
       int temp = 0;                  //Now flush the buffer so we dont transmit this command
       while (Serial.available() && temp < 10){
         Serial.read();
-      temp++;
-    }
-    temp = 0;
+        temp++;
+      }
+      temp = 0;
     }
     else{                            //else this is not a command
       if (!transmitting_now){        //Did we just start transmitting a message?

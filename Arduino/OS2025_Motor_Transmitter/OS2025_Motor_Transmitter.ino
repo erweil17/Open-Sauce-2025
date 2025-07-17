@@ -18,10 +18,10 @@ Stepper Stepper(200, stepPin, dirPin);
 bool bit;
 int bitcount;
 int lastBit = -1;
+bool firstCall = true;
 
 void bitTransmitter() {
   static int lastBit = 0;
-  static bool firstCall = true;
 
   int steps;
 
@@ -48,10 +48,10 @@ void bitTransmitter() {
 
 
 void setup() {
-	
+
   Serial.begin(9600);
 
-	Stepper.setSpeed(100000); //change this to change the speed
+Stepper.setSpeed(100000); //change this to change the speed
 
   pinMode(enablePin, OUTPUT);
   digitalWrite(enablePin, LOW);
@@ -60,7 +60,7 @@ void setup() {
 
 void loop() {
   
-	if (Serial.available() > 0){             //If bytes are waiting at the serial port, we must be transmitting
+  if (Serial.available() > 0){             //If bytes are waiting at the serial port, we must be transmitting
     if (transmitting_now == 0){
 
       //IF THE MOTOR NEEDS ANY INITIALIZATION BEFORE TURNING, DO IT HERE
@@ -91,11 +91,6 @@ void loop() {
     transmitting_now = 0;
     buffer_big_enough = 0;
     //PUT YOUR MOTOR INTO A SAFE STATE HERE. TURN STUFF OFF IF NEEDED, ETC.
-
+    firstCall = true;
   }
-	
-
-	
-	
-
 }
